@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// NewExpense acts a Factory Method for new Expenses enforcinf invariants for the Expense entity
+// NewExpense acts a Factory Method for new Expenses enforcing invariants for the Expense entity
 func NewExpense(amount float64, product string, shop string, date time.Time, category Category) (*Expense, error) {
 	newExpense := Expense{
 		Amount:   amount,

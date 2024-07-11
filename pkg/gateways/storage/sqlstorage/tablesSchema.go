@@ -140,6 +140,16 @@ CREATE TABLE IF NOT EXISTS categories (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE category_budgets (
+  id bigint(64),
+  category_id varchar(255),
+  budget float(16),
+  year int(4),
+  month int(2),
+  PRIMARY KEY (id),
+  CONSTRAINT fk_categories_budget_category FOREIGN KEY (category_id) REFERENCES categories (id)
+);
+
 CREATE TABLE IF NOT EXISTS rules (
   id TEXT NOT NULL,
   pattern TEXT,

@@ -36,6 +36,20 @@ func (c *Category) Validate() (*Category, error) {
 	return c, nil
 }
 
+func (cb *CategoryBudget) Validate() (*CategoryBudget, error) {
+	validate := validator.New()
+	validate.RegisterValidation("alphanum_space", spaceOrLetter)
+	err := validate.Struct(cb)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			fmt.Println(err)
+		}
+		fmt.Println(err)
+		return nil, ErrInvalidEntity
+	}
+	return cb, nil
+}
+
 func (r *Rule) Validate() (*Rule, error) {
 	validate := validator.New()
 	err := validate.Struct(r)

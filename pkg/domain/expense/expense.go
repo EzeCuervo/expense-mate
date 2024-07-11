@@ -49,6 +49,14 @@ type Category struct {
 	Name string     `validate:"required,min=3,alphanum_space"`
 }
 
+// Category Budget is an entity that is supposed to be accessed only from the Expense aggregate
+type CategoryBudget struct {
+	ID     CategoryID `validate:"required,min=3"`
+	Amount float64    `validate:"required"`
+	Year   int        `validate:"required"`
+	Month  int        `validate:"required"`
+}
+
 // Expenses is the expenses repository
 type Expenses interface {
 	// All retrieves all Expenses with pagination
@@ -75,4 +83,14 @@ type Expenses interface {
 	AddCategory(c Category) error
 	// GetCategory retrieves a category by ID
 	GetCategory(id CategoryID) (*Category, error)
+	// GetCategoryBudgets retrieves all category budgets
+	GetCategoryBudgets() ([]CategoryBudget, error)
+	// DeleteCategoryBudget is used to remove a category budget
+	DeleteCategoryBudget(id CategoryID, year int, month int) error
+	// AddCategoryBudget is used to save a new category budget
+	AddCategoryBudget(b CategoryBudget) error
+	// UpdateCategoryBudget is used to update a category budget
+	UpdateCategoryBudget(b CategoryBudget) error
+	// GetCategoryBudget retrieves a category budget by ID
+	GetCategoryBudget(id CategoryID, year int, month int) (*CategoryBudget, error)
 }

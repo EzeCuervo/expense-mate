@@ -46,7 +46,7 @@ func main() {
 		db, err = sql.Open("mysql", mysqlUser+mysqlUrl)
 		defer db.Close()
 		if err != nil {
-			initLogger.Err("Error instanciating mysql: %v", err)
+			initLogger.Err("Error instantiating mysql: %v", err)
 			return
 		}
 		statements := strings.Split(sqlstorage.MySQLTables, ";")
@@ -89,7 +89,7 @@ func main() {
 		}
 		initLogger.Info("SQLte storage initialized on %s", path)
 	case "":
-		initLogger.Err("No storage set. Please set STORAGE_ENGINE variabel")
+		initLogger.Err("No storage set. Please set STORAGE_ENGINE variable")
 	}
 	expensesStorage := sqlstorage.NewExpensesStorage(db)
 	ruleStorage := sqlstorage.NewRulesStorage(db)
@@ -97,7 +97,7 @@ func main() {
 	// JSON Storage
 	path := os.Getenv("JSON_STORAGE_PATH")
 	if path == "" {
-		initLogger.Err("No storage set. Please set STORAGE_ENGINE variabel")
+		initLogger.Err("No storage set. Please set STORAGE_ENGINE variable")
 		return
 	}
 	initLogger.Info("LOAD_SAMPLE_DATA=%s", os.Getenv("LOAD_SAMPLE_DATA"))
@@ -128,9 +128,10 @@ func main() {
 	createCategory := managing.NewCategoryCreator(managerLogger, expensesStorage)
 	deleteCategory := managing.NewCategoryDeleter(managerLogger, expensesStorage, ruleStorage)
 	updateCategory := managing.NewCategoryUpdater(managerLogger, expensesStorage)
+	createCategoryBudget := managing.NewCategoryBudgetCreator(managerLogger, expensesStorage)
 	ruleManager := managing.NewRuleManager(managerLogger, ruleStorage, expensesStorage, userStorage)
 	userManager := managing.NewUserManager(managerLogger, userStorage, expensesStorage)
-	manager := managing.NewService(*deleteCategory, *createCategory, *updateCategory, *commandTelegram, *ruleManager, *userManager)
+	manager := managing.NewService(*deleteCategory, *createCategory, *updateCategory, *createCategoryBudget, *commandTelegram, *ruleManager, *userManager)
 	// Tracking
 	createExpense := tracking.NewExpenseCreator(trackerLogger, expensesStorage)
 	updateExpense := tracking.NewExpenseUpdater(trackerLogger, expensesStorage)

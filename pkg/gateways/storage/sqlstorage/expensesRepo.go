@@ -196,6 +196,71 @@ func (sqls *ExpensesStorage) GetCategory(id expense.CategoryID) (*expense.Catego
 	return &category, nil
 }
 
+func (sqls *ExpensesStorage) GetCategoryBudget(id expense.CategoryID, year int, month int) (*expense.CategoryBudget, error) {
+	query := "SELECT id, amount, year, month FROM category_budgets WHERE id=? AND year=? AND month=?"
+	var categoryBudget expense.CategoryBudget
+	err := sqls.db.QueryRow(query, id, year, month).Scan(&categoryBudget.ID, &categoryBudget.Amount, &categoryBudget.Year, &categoryBudget.Month)
+	if err != nil {
+		return nil, err
+	}
+	return &categoryBudget, nil
+}
+
+func (sqls *ExpensesStorage) AddCategoryBudget(b expense.CategoryBudget) error {
+	stmt, err := sqls.db.Prepare("INSERT INTO category_budgets (id, amount, year, month) VALUES (?,?,?,?)")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(b.ID, b.Amount, b.Year, b.Month)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sqls *ExpensesStorage) UpdateCategoryBudget(b expense.CategoryBudget) error {
+	stmt, err := sqls.db.Prepare("UPDATE category_budgets SET amount=? WHERE id=? AND year=? AND month=?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(b.Amount, b.ID, b.Year, b.Month)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sqls *ExpensesStorage) DeleteCategoryBudget(id expense.CategoryID, year int, month int) error {
+	stmt, err := sqls.db.Prepare("DELETE FROM category_budgets WHERE id=? AND year=? AND month=?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(id, year, month)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sqls *ExpensesStorage) GetCategoryBudgets() ([]expense.CategoryBudget, error) {
+	query := "SELECT id, amount, year, month FROM category_budgets"
+	rows, err := sqls.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var categoryBudgets []expense.CategoryBudget
+	for rows.Next() {
+		var categoryBudget expense.CategoryBudget
+		err := rows.Scan(&categoryBudget.ID, &categoryBudget.Amount, &categoryBudget.Year, &categoryBudget.Month)
+		if err != nil {
+			return nil, err
+		}
+		categoryBudgets = append(categoryBudgets, categoryBudget)
+	}
+	return categoryBudgets, nil
+}
+
 // CountWithFilter
 func (sqls *ExpensesStorage) CountWithFilter(user_ids, categories_ids []string, minAmount, maxAmount uint, shop, product string, from time.Time, to time.Time) (uint, error) {
 	var conditions []string
